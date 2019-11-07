@@ -1,4 +1,9 @@
-declare module Ammo {
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-use-before-define */
+/* eslint-disable @typescript-eslint/camelcase */
+/* eslint-disable @typescript-eslint/class-name-casing */
+
+declare namespace Ammo {
 function destroy(type: any): void;
 function getPointer(obj: any): number;
 type PHY_ScalarType = string;
@@ -849,6 +854,8 @@ export class hbrKinematicCharacterController extends btActionInterface  {
 	constructor(ghostObject: btPairCachingGhostObject, convexShape: btConvexShape, stepHeight: number, upAxis?: btVector3);
 	setUp(up: btVector3): void;
 	applyImpulse(v: btVector3): void;
+	applyCentralImpulse(v: btVector3): void;
+	applyCentralForce(v: btVector3): void;
 	setWalkDirection(walkDirection: btVector3): void;
 	reset(collisionWorld: btCollisionWorld): void;
 	warp(origin: btVector3): void;

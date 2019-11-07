@@ -193,6 +193,9 @@ interface btManifoldPoint {
   [Value] attribute btVector3 m_positionWorldOnB;
   [Value] attribute btVector3 m_positionWorldOnA;
   [Value] attribute btVector3 m_normalWorldOnB;
+
+  // // Contact callback support
+  // attribute any m_userPersistentData;
 };
 
 [Prefix="btCollisionWorld::"]
@@ -721,6 +724,11 @@ interface btDiscreteDynamicsWorld: btDynamicsWorld {
 
   long stepSimulation(float timeStep, optional long maxSubSteps, optional float fixedTimeStep);
 
+  // Contact callback support
+  // void setContactAddedCallback(long funcpointer);
+  // void setContactProcessedCallback(long funcpointer);
+  // void setContactDestroyedCallback(long funcpointer);
+
   void setSynchronizeAllMotionStates(boolean synchronizeAll);
 };
 btDiscreteDynamicsWorld implements btDynamicsWorld;
@@ -853,6 +861,8 @@ interface hbrKinematicCharacterController: btActionInterface {
 
   void setUp ([Const,Ref] btVector3 up);
   void applyImpulse([Const,Ref] btVector3 v);
+  void applyCentralImpulse([Const,Ref] btVector3 v);
+  void applyCentralForce([Const,Ref] btVector3 v);
   void setWalkDirection ([Const,Ref] btVector3 walkDirection);
   void reset (btCollisionWorld collisionWorld);
   void warp ([Const, Ref] btVector3 origin);

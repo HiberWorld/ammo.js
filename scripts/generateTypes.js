@@ -300,7 +300,11 @@ function printModuleMember(module) {
     module = WebIDL2.parse(idl);
     // print(JSON.stringify(module)); 
     
-    print("declare module Ammo {\n");
+    print(`/* eslint-disable @typescript-eslint/no-explicit-any */\n`);
+    print(`/* eslint-disable @typescript-eslint/no-use-before-define */\n`);
+    print(`/* eslint-disable @typescript-eslint/camelcase */\n`);
+    print(`/* eslint-disable @typescript-eslint/class-name-casing */\n\n`);
+    print("declare namespace Ammo {\n");
     print("function destroy(type: any): void;\n");
     print("function getPointer(obj: any): number;\n");
 

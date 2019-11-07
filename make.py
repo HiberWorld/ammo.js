@@ -48,6 +48,7 @@ def which(program):
 
 
 def build():
+    print "EMSCRIPTEN_ROOT"
     EMSCRIPTEN_ROOT = os.environ.get('EMSCRIPTEN')
     if not EMSCRIPTEN_ROOT:
         emcc = which('emcc')
@@ -73,12 +74,12 @@ def build():
 
     wasm = 'wasm' in sys.argv
     closure = 'closure' in sys.argv
-
-    args = '-O3 --llvm-lto 1 -s NO_EXIT_RUNTIME=1 -s MINIMAL_RUNTIME=2 -s ENVIRONMENT=web -s NO_FILESYSTEM=1 -s EXPORTED_RUNTIME_METHODS=["Pointer_stringify"]'
+# -s MINIMAL_RUNTIME=1
+    args = '-O3 --llvm-lto 1 -s NO_EXIT_RUNTIME=1 -s ENVIRONMENT=web -s NO_FILESYSTEM=1 -s EXPORTED_RUNTIME_METHODS=["Pointer_stringify"] -mnontrapping-fptoint'
     if not wasm:
-        args += ' -s WASM=0 -s AGGRESSIVE_VARIABLE_ELIMINATION=1 -s ELIMINATE_DUPLICATE_FUNCTIONS=1 -s SINGLE_FILE=1'
+        args += ' -s WASM=0 -s AGGRESSIVE_VARIABLE_ELIMINATION=1 -s ELIMINATE_DUPLICATE_FUNCTIONS=1'
     else:
-        args += ''' -s WASM=1 -s BINARYEN_IGNORE_IMPLICIT_TRAPS=1 -s BINARYEN_TRAP_MODE="clamp"'''
+        args += ''' -s WASM=1 -s BINARYEN_IGNORE_IMPLICIT_TRAPS=1'''
     if closure:
         # closure complains about the bullet Node class (Node is a DOM thing too)
         args += ' --closure 1 -s IGNORE_CLOSURE_COMPILER_ERRORS=1'
@@ -150,8 +151,8 @@ def build():
         args = ['-I../src', '-c']
         for include in INCLUDES:
             args += ['-include', include]
-        emscripten.Building.emcc('glue.cpp', args, 'glue.bc')
-        assert(os.path.exists('glue.bc'))
+        emscripten.Building.emcc('glue.cpp', args, 'glue.o')
+        assert(os.path.exists('glue.o'))
 
         # Configure with CMake on Windows, and with configure on Unix.
         cmake_build = emscripten.WINDOWS
@@ -167,11 +168,13 @@ def build():
                                                '-DBUILD_BULLET3=OFF',
                                                '-DBUILD_BULLET2_DEMOS=OFF',
                                                '-DBUILD_OPENGL3_DEMOS=OFF',
+                                               '-DBUILD_EGL=OFF'
                                                '-DBUILD_ENET=OFF',
                                                '-DBUILD_CLSOCKET=OFF',
                                                '-DBUILD_UNIT_TESTS=OFF',
+                                               '-DBULLET2_MULTITHREADING=OFF'
                                                '-DUSE_GLUT=OFF',
-
+                                               '-DUSE_SOFT_BODY_MULTI_BODY_DYNAMICS_WORLD=OFF'
                                                '-DUSE_GRAPHICAL_BENCHMARK=OFF',
                                                '-USE_MSVC_SSE2=OFF',])
         else:
@@ -205,13 +208,11 @@ def build():
                                         'libBulletCollision.a'),
                            os.path.join('src', '.libs', 'libLinearMath.a')]
 
-        emscripten.Building.link(['glue.bc'] + bullet_libs, 'libbullet.bc')
-        assert os.path.exists('libbullet.bc')
 
         stage('emcc: ' + ' '.join(emcc_args))
 
         temp = os.path.join('..', '..', 'builds', target)
-        emscripten.Building.emcc('libbullet.bc', emcc_args + ['--js-transform', 'python %s' % os.path.join('..', '..', 'bundle.py')],
+        emscripten.Building.emcc('-DNOTHING_WAKA_WAKA', emcc_args + ['glue.o'] + bullet_libs + ['--js-transform', 'python %s' % os.path.join('..', '..', 'bundle.py')],
                                  temp)
 
         assert os.path.exists(temp), 'Failed to create script code'
