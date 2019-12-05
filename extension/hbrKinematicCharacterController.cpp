@@ -929,18 +929,29 @@ void hbrKinematicCharacterController::playerStep(btCollisionWorld *collisionWorl
 		// btVector3 groundFriction = m_localVelocity - m_localVelocity * btPow(btScalar(1.0) - m_friction, dt);
 		groundFriction.setY(0.0f);
 
-		btVector3 asd(0.0f, 0.0f, 0.0f);
-		if (speed <= maxVelocity && m_walkDirection.length2() > SIMD_EPSILON)
+		btScalar dotProdWalk = m_walkDirection.dot(m_localVelocity);
+
+		btVector3 frictionOffset(0.0f, 0.0f, 0.0f);
+		if (m_walkDirection.length2() > SIMD_EPSILON)
 		{
-			asd = projectVectors(groundFriction, m_walkDirection);
+			frictionOffset = projectVectors(groundFriction, m_walkDirection);
+
+			if (dotProdWalk < 0.0f)
+			{
+				frictionOffset *= 0.5f;
+			}
+			else if (speed > maxVelocity)
+			{
+				frictionOffset *= 0.9f;
+			}
 		}
 
-		m_localVelocity += groundFriction - asd;
+		m_localVelocity += groundFriction - frictionOffset;
 
 		// printf("friction(%f,%f,%f)\n", asd[0],asd[1],asd[2]);
 		// frictionMagnitude = groundFriction.length();
 		// printf("Dot=(%f)\n", velDot);
-		// printf("Dot=(%f)\n", dotasd);
+		// printf("Dot=(%f)\n", dotProdWalk);
 	}
 	else
 	{
@@ -956,7 +967,9 @@ void hbrKinematicCharacterController::playerStep(btCollisionWorld *collisionWorl
 		accelVel = btMax(maxVelocity - projVel, 0.0f);
 	}
 
-	m_acceleration += m_walkDirection * accelVel - m_gravity * m_up * dt;
+	btScalar gravity = m_isAirWalking ? 0.0 : m_gravity;
+
+	m_acceleration += m_walkDirection * accelVel - gravity * m_up * dt;
 
 	if (m_localVelocity[1] < 0.0 && btFabs(m_localVelocity[1]) > btFabs(m_fallSpeed))
 	{
