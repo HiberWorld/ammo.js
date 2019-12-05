@@ -64,6 +64,9 @@ protected:
 
 	btScalar m_addedMargin; //@todo: remove this and fix the code
 
+	
+	btScalar m_deAccelerationMultiplier;
+
 	///this is the desired walk direction, set by the user
 	btVector3 m_walkDirection;
 	btVector3 m_normalizedDirection;
@@ -111,6 +114,10 @@ protected:
 
 	btScalar m_linearDamping;
 	btScalar m_angularDamping;
+
+	
+	btVector3 m_groundNormal;
+	btVector3 m_prevVelocity;
 
 	bool m_wasOnGround;
 	bool m_wasJumping;
@@ -213,6 +220,7 @@ public:
 	void setFriction(btScalar friction) { m_friction = friction; };
 	void setDrag(btScalar friction) { m_drag = friction; };
 	void setJumpOffset(btScalar ms) { m_jumpOffset = ms; };
+	void setDeAccelerationMultiplier(btScalar multiplier) { m_deAccelerationMultiplier = multiplier; };
 
 	void applyExternalVelocity();
 
@@ -251,7 +259,7 @@ public:
 	bool onGround() const;
 	void setUpInterpolate(bool value);
 
-	inline btVector3 projectVectors(btVector3 &v1, btVector3 &v2)  const;
+	inline btVector3 projectVectors(const btVector3 &v1, const btVector3 &v2)  const;
 };
 
 #endif // HBR_KINEMATIC_CHARACTER_CONTROLLER_H

@@ -201,11 +201,15 @@ hbrKinematicCharacterController::hbrKinematicCharacterController(btPairCachingGh
 	m_linearDamping = btScalar(0.0);
 	m_angularDamping = btScalar(0.0);
 
+	m_prevVelocity.setValue(0.0, 0.0, 0.0);
+
 	m_localVelocity.setValue(0.0, 0.0, 0.0);
 	m_externalVelocity.setValue(0.0, 0.0, 0.0);
 	m_velocity.setValue(0.0, 0.0, 0.0);
 	m_moveOffset.setValue(0.0, 0.0, 0.0);
 	m_acceleration.setValue(0.0, 0.0, 0.0);
+
+	m_groundNormal.setValue(0.0, 1.0, 0.0);
 
 	m_walkMaxSpeed = btScalar(5.0);
 	m_runMaxSpeed = btScalar(5.0);
@@ -222,6 +226,7 @@ hbrKinematicCharacterController::hbrKinematicCharacterController(btPairCachingGh
 	m_currentSpeed = 0.0;
 	m_isAirWalking = false;
 	m_speedModifier = 1.0;
+	m_deAccelerationMultiplier = 0.9;
 
 	setUp(up);
 	setStepHeight(stepHeight);
@@ -579,6 +584,7 @@ void hbrKinematicCharacterController::stepDown(btCollisionWorld *collisionWorld,
 		if (callback.hasHit() && m_ghostObject->hasContactResponse())
 		{
 			// printf("m_hitNormalWorld(%f,%f,%f)\n", callback.m_hitNormalWorld[0], callback.m_hitNormalWorld[1], callback.m_hitNormalWorld[2]);
+			m_groundNormal = callback.m_hitNormalWorld;
 
 			m_wasJumping = false;
 			m_onGround = true;
@@ -691,6 +697,7 @@ void hbrKinematicCharacterController::stepDown(btCollisionWorld *collisionWorld,
 		m_onGround = true;
 		m_standingCollisionObject = callback.m_hitCollisionObject;
 		m_standingPoint = callback.m_hitPointWorld;
+		m_groundNormal = callback.m_hitNormalWorld;
 	}
 	else
 	{
@@ -881,6 +888,7 @@ void hbrKinematicCharacterController::playerStep(btCollisionWorld *collisionWorl
 		m_targetOrientation = m_currentOrientation;
 	}
 
+	m_prevVelocity = m_localVelocity;
 	m_wasOnGround = m_onGround;
 
 	m_onGround = false;
@@ -942,7 +950,7 @@ void hbrKinematicCharacterController::playerStep(btCollisionWorld *collisionWorl
 			}
 			else if (speed > maxVelocity)
 			{
-				frictionOffset *= 0.9f;
+				frictionOffset *= m_deAccelerationMultiplier;
 			}
 		}
 
@@ -1254,11 +1262,26 @@ void hbrKinematicCharacterController::jump(const btVector3 &v)
 		m_localVelocity.setY(0.0);
 	}
 
+	// printf("m_hitNormalWorld(%f,%f,%f)\n", m_groundNormal[0], m_groundNormal[1], m_groundNormal[2]);
+
 	m_externalVelocity.setY(btMax(0.0f, m_externalVelocity.y()));
 
 	applyExternalVelocity();
 
-	m_localVelocity += m_jumpAxis * m_verticalVelocity * m_speedModifier;
+	// btVector3 extraVelocity = projectVectors(m_prevVelocity, m_groundNormal);
+
+	btVector3 extraVelocity(0.0f, 0.0f, 0.0f);
+
+	if (m_localVelocity.length2() > 0.1f)
+	{
+		extraVelocity = m_localVelocity.length() * projectVectors(m_prevVelocity.length() * m_groundNormal, m_localVelocity.normalized()) * 0.025f;
+	}
+
+	// printf("m_prevVelocity(%f,%f,%f)\n", m_prevVelocity[0], m_prevVelocity[1], m_prevVelocity[2]);
+	// printf("extraVelocity(%f,%f,%f)\n", extraVelocity[0], extraVelocity[1], extraVelocity[2]);
+	// printf("m_localVelocity(%f,%f,%f)\n", m_localVelocity[0], m_localVelocity[1], m_localVelocity[2]);
+
+	m_localVelocity += m_jumpAxis * m_verticalVelocity * m_speedModifier + extraVelocity;
 #if 0
 	currently no jumping.
 	btTransform xform;
@@ -1376,7 +1399,7 @@ btQuaternion hbrKinematicCharacterController::getRotation(btVector3 &v0, btVecto
 	return shortestArcQuatNormalize2(v0, v1);
 }
 
-inline btVector3 hbrKinematicCharacterController::projectVectors(btVector3 &v1, btVector3 &v2) const
+inline btVector3 hbrKinematicCharacterController::projectVectors(const btVector3 &v1, const btVector3 &v2) const
 {
 	float v2_ls = v2.length2();
 	return v2 * (v2.dot(v1) / v2_ls);

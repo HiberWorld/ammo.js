@@ -878,6 +878,7 @@ export class hbrKinematicCharacterController extends btActionInterface  {
 	setFriction(friction: number): void;
 	setDrag(drag: number): void;
 	setJumpOffset(ms: number): void;
+	setDeAccelerationMultiplier(multiplier: number): void;
 	canJump(): boolean;
 	jump(): void;
 	setGravity(gravity: btVector3): void;

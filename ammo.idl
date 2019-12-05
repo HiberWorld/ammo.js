@@ -888,6 +888,8 @@ interface hbrKinematicCharacterController: btActionInterface {
   void setFriction (float friction);
   void setDrag (float drag);
   void setJumpOffset (float ms);
+  void setDeAccelerationMultiplier(float multiplier);
+  
   boolean canJump ();
   void jump ();
   void setGravity ([Const,Ref] btVector3 gravity);
