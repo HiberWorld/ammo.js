@@ -172,9 +172,23 @@ interface RayResultCallback {
   [Const] attribute btCollisionObject m_collisionObject;
 };
 
+interface hbrClosestRayResultCallback: RayResultCallback {
+  void hbrClosestRayResultCallback([Const, Ref] btVector3 from, [Const, Ref] btVector3 to);
+
+  attribute long m_flags;
+
+  [Value] attribute btVector3 m_rayFromWorld;
+  [Value] attribute btVector3 m_rayToWorld;
+  [Value] attribute btVector3 m_hitNormalWorld;
+  [Value] attribute btVector3 m_hitPointWorld;
+};
+hbrClosestRayResultCallback implements RayResultCallback;
+
 [Prefix="btCollisionWorld::"]
 interface ClosestRayResultCallback: RayResultCallback {
   void ClosestRayResultCallback([Const, Ref] btVector3 from, [Const, Ref] btVector3 to);
+
+  attribute long m_flags;
 
   [Value] attribute btVector3 m_rayFromWorld;
   [Value] attribute btVector3 m_rayToWorld;
@@ -182,6 +196,50 @@ interface ClosestRayResultCallback: RayResultCallback {
   [Value] attribute btVector3 m_hitPointWorld;
 };
 ClosestRayResultCallback implements RayResultCallback;
+
+interface btConstCollisionObjectArray {
+  long size();
+  [Const] btCollisionObject at(long n);
+};
+
+interface btScalarArray {
+  long size();
+  float at(long n);
+};
+
+[Prefix="btCollisionWorld::"]
+interface AllHitsRayResultCallback {
+  void AllHitsRayResultCallback([Const, Ref] btVector3 from, [Const, Ref] btVector3 to);
+  
+  attribute long m_flags;
+
+  [Value] attribute btConstCollisionObjectArray m_collisionObjects;
+  [Value] attribute btVector3 m_rayFromWorld;
+  [Value] attribute btVector3 m_rayToWorld;
+  [Value] attribute btVector3Array m_hitNormalWorld;
+  [Value] attribute btVector3Array m_hitPointWorld;
+  [Value] attribute btScalarArray m_hitFractions;
+};
+AllHitsRayResultCallback implements RayResultCallback;
+
+interface hbrAllHitsRayResultCallback {
+  void hbrAllHitsRayResultCallback([Const, Ref] btVector3 from, [Const, Ref] btVector3 to);
+  
+  attribute long m_flags;
+
+  boolean hasHit();
+  
+  attribute float a_closestHitFraction;
+
+  [Value] attribute btVector3 m_closestHitNormalWorld;
+  [Value] attribute btVector3 m_closestHitPointWorld;
+
+  [Value] attribute btVector3 m_rayFromWorld;
+  [Value] attribute btVector3 m_rayToWorld;
+
+  [Const] attribute btCollisionObject m_collisionObject;
+};
+hbrAllHitsRayResultCallback implements RayResultCallback;
 
 interface btManifoldPoint {
   [Const, Ref] btVector3 getPositionWorldOnA();

@@ -174,8 +174,10 @@ export class RayResultCallback {
 	set_m_collisionObject(value: btCollisionObject): void;
 }
 
-export class ClosestRayResultCallback extends RayResultCallback  {
+export class hbrClosestRayResultCallback extends RayResultCallback  {
 	constructor(from: btVector3, to: btVector3);
+	get_m_flags(): number;
+	set_m_flags(value: number): void;
 	get_m_rayFromWorld(): btVector3;
 	set_m_rayFromWorld(value: btVector3): void;
 	get_m_rayToWorld(): btVector3;
@@ -184,6 +186,67 @@ export class ClosestRayResultCallback extends RayResultCallback  {
 	set_m_hitNormalWorld(value: btVector3): void;
 	get_m_hitPointWorld(): btVector3;
 	set_m_hitPointWorld(value: btVector3): void;
+}
+
+export class ClosestRayResultCallback extends RayResultCallback  {
+	constructor(from: btVector3, to: btVector3);
+	get_m_flags(): number;
+	set_m_flags(value: number): void;
+	get_m_rayFromWorld(): btVector3;
+	set_m_rayFromWorld(value: btVector3): void;
+	get_m_rayToWorld(): btVector3;
+	set_m_rayToWorld(value: btVector3): void;
+	get_m_hitNormalWorld(): btVector3;
+	set_m_hitNormalWorld(value: btVector3): void;
+	get_m_hitPointWorld(): btVector3;
+	set_m_hitPointWorld(value: btVector3): void;
+}
+
+export class btConstCollisionObjectArray {
+	size(): number;
+	at(n: number): btCollisionObject;
+}
+
+export class btScalarArray {
+	size(): number;
+	at(n: number): number;
+}
+
+export class AllHitsRayResultCallback {
+	constructor(from: btVector3, to: btVector3);
+	get_m_flags(): number;
+	set_m_flags(value: number): void;
+	get_m_collisionObjects(): btConstCollisionObjectArray;
+	set_m_collisionObjects(value: btConstCollisionObjectArray): void;
+	get_m_rayFromWorld(): btVector3;
+	set_m_rayFromWorld(value: btVector3): void;
+	get_m_rayToWorld(): btVector3;
+	set_m_rayToWorld(value: btVector3): void;
+	get_m_hitNormalWorld(): btVector3Array;
+	set_m_hitNormalWorld(value: btVector3Array): void;
+	get_m_hitPointWorld(): btVector3Array;
+	set_m_hitPointWorld(value: btVector3Array): void;
+	get_m_hitFractions(): btScalarArray;
+	set_m_hitFractions(value: btScalarArray): void;
+}
+
+export class hbrAllHitsRayResultCallback {
+	constructor(from: btVector3, to: btVector3);
+	hasHit(): boolean;
+	get_m_flags(): number;
+	set_m_flags(value: number): void;
+	get_a_closestHitFraction(): number;
+	set_a_closestHitFraction(value: number): void;
+	get_m_closestHitNormalWorld(): btVector3;
+	set_m_closestHitNormalWorld(value: btVector3): void;
+	get_m_closestHitPointWorld(): btVector3;
+	set_m_closestHitPointWorld(value: btVector3): void;
+	get_m_rayFromWorld(): btVector3;
+	set_m_rayFromWorld(value: btVector3): void;
+	get_m_rayToWorld(): btVector3;
+	set_m_rayToWorld(value: btVector3): void;
+	get_m_collisionObject(): btCollisionObject;
+	set_m_collisionObject(value: btCollisionObject): void;
 }
 
 export class btManifoldPoint {

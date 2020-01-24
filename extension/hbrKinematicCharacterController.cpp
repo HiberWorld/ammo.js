@@ -13,7 +13,7 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include <stdio.h>
+// #include <stdio.h>
 #include "LinearMath/btIDebugDraw.h"
 #include "BulletCollision/CollisionDispatch/btGhostObject.h"
 #include "BulletCollision/CollisionShapes/btMultiSphereShape.h"
@@ -1270,18 +1270,19 @@ void hbrKinematicCharacterController::jump(const btVector3 &v)
 
 	// btVector3 extraVelocity = projectVectors(m_prevVelocity, m_groundNormal);
 
-	btVector3 extraVelocity(0.0f, 0.0f, 0.0f);
+	//btVector3 extraVelocity(0.0f, 0.0f, 0.0f);
 
-	if (m_localVelocity.length2() > 0.1f)
-	{
-		extraVelocity = m_localVelocity.length() * projectVectors(m_prevVelocity.length() * m_groundNormal, m_localVelocity.normalized()) * 0.025f;
-	}
+	// && m_groundNormal.dot(m_localVelocity) >= 0.0f
+	// if (m_localVelocity.length2() > 0.1f)
+	// {
+	// 	extraVelocity = m_prevVelocity.length() * m_groundNormal * 0.2f;
+	// }
 
 	// printf("m_prevVelocity(%f,%f,%f)\n", m_prevVelocity[0], m_prevVelocity[1], m_prevVelocity[2]);
 	// printf("extraVelocity(%f,%f,%f)\n", extraVelocity[0], extraVelocity[1], extraVelocity[2]);
 	// printf("m_localVelocity(%f,%f,%f)\n", m_localVelocity[0], m_localVelocity[1], m_localVelocity[2]);
 
-	m_localVelocity += m_jumpAxis * m_verticalVelocity * m_speedModifier + extraVelocity;
+	m_localVelocity += m_jumpAxis * m_verticalVelocity * m_speedModifier;// + extraVelocity;
 #if 0
 	currently no jumping.
 	btTransform xform;

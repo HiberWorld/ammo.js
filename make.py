@@ -24,6 +24,7 @@ INCLUDES = ['btBulletDynamicsCommon.h',
                          'btKinematicCharacterController.h'),
 
             os.path.join('..', '..', 'extension', 'hbrKinematicCharacterController.cpp'),
+            os.path.join('..', '..', 'extension', 'hbrClosestRayResultCallback.h'),
 
             os.path.join('BulletSoftBody', 'btSoftBody.h'),
             os.path.join('BulletSoftBody', 'btSoftRigidDynamicsWorld.h'), os.path.join(
@@ -75,7 +76,7 @@ def build():
     wasm = 'wasm' in sys.argv
     closure = 'closure' in sys.argv
 # -s MINIMAL_RUNTIME=1
-    args = '-O3 --llvm-lto 1 -s NO_EXIT_RUNTIME=1 -s ENVIRONMENT=web -s NO_FILESYSTEM=1 -s EXPORTED_RUNTIME_METHODS=["Pointer_stringify"] -mnontrapping-fptoint'
+    args = '-O3 --llvm-lto 1 -s WASM_OBJECT_FILES=0 -s NO_EXIT_RUNTIME=1 -s ENVIRONMENT=web -s NO_FILESYSTEM=1 -s EXPORTED_RUNTIME_METHODS=["Pointer_stringify"] -mnontrapping-fptoint'
     if not wasm:
         args += ' -s WASM=0 -s AGGRESSIVE_VARIABLE_ELIMINATION=1 -s ELIMINATE_DUPLICATE_FUNCTIONS=1'
     else:
