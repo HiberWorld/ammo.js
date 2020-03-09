@@ -222,7 +222,7 @@ interface AllHitsRayResultCallback {
 };
 AllHitsRayResultCallback implements RayResultCallback;
 
-interface hbrAllHitsRayResultCallback {
+interface hbrAllHitsRayResultCallback: RayResultCallback {
   void hbrAllHitsRayResultCallback([Const, Ref] btVector3 from, [Const, Ref] btVector3 to);
   
   attribute long m_flags;
@@ -233,11 +233,11 @@ interface hbrAllHitsRayResultCallback {
 
   [Value] attribute btVector3 m_closestHitNormalWorld;
   [Value] attribute btVector3 m_closestHitPointWorld;
+  [Const] attribute btCollisionObject m_closestCollisionObject;
 
   [Value] attribute btVector3 m_rayFromWorld;
   [Value] attribute btVector3 m_rayToWorld;
 
-  [Const] attribute btCollisionObject m_collisionObject;
 };
 hbrAllHitsRayResultCallback implements RayResultCallback;
 
@@ -941,6 +941,9 @@ interface hbrKinematicCharacterController: btActionInterface {
   void setAirAcceleration (float acceleration);
   void setFlyAcceleration (float acceleration);
 
+  void setBunnyHopEnabled (boolean enabled);
+  void setBunnyHopFactor (float speed);
+  
   void setSpeedModifier (float speed);
   void setAirWalking (boolean enabled);
   void setFriction (float friction);

@@ -212,7 +212,7 @@ def build():
 
         stage('emcc: ' + ' '.join(emcc_args))
 
-        temp = os.path.join('..', '..', 'builds', target)
+        temp = os.path.join('D:\projects\hibervr-platform\studio\public\workers\Fysik', target)
         emscripten.Building.emcc('-DNOTHING_WAKA_WAKA', emcc_args + ['glue.o'] + bullet_libs + ['--js-transform', 'python %s' % os.path.join('..', '..', 'bundle.py')],
                                  temp)
 

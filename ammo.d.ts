@@ -230,7 +230,7 @@ export class AllHitsRayResultCallback {
 	set_m_hitFractions(value: btScalarArray): void;
 }
 
-export class hbrAllHitsRayResultCallback {
+export class hbrAllHitsRayResultCallback extends RayResultCallback  {
 	constructor(from: btVector3, to: btVector3);
 	hasHit(): boolean;
 	get_m_flags(): number;
@@ -241,12 +241,12 @@ export class hbrAllHitsRayResultCallback {
 	set_m_closestHitNormalWorld(value: btVector3): void;
 	get_m_closestHitPointWorld(): btVector3;
 	set_m_closestHitPointWorld(value: btVector3): void;
+	get_m_closestCollisionObject(): btCollisionObject;
+	set_m_closestCollisionObject(value: btCollisionObject): void;
 	get_m_rayFromWorld(): btVector3;
 	set_m_rayFromWorld(value: btVector3): void;
 	get_m_rayToWorld(): btVector3;
 	set_m_rayToWorld(value: btVector3): void;
-	get_m_collisionObject(): btCollisionObject;
-	set_m_collisionObject(value: btCollisionObject): void;
 }
 
 export class btManifoldPoint {
@@ -936,6 +936,8 @@ export class hbrKinematicCharacterController extends btActionInterface  {
 	setRunAcceleration(acceleration: number): void;
 	setAirAcceleration(acceleration: number): void;
 	setFlyAcceleration(acceleration: number): void;
+	setBunnyHopEnabled(enabled: boolean): void;
+	setBunnyHopFactor(speed: number): void;
 	setSpeedModifier(speed: number): void;
 	setAirWalking(enabled: boolean): void;
 	setFriction(friction: number): void;

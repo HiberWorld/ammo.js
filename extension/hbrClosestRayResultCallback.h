@@ -51,7 +51,8 @@ struct hbrClosestRayResultCallback : public btCollisionWorld::RayResultCallback
 		hbrAllHitsRayResultCallback(const btVector3& rayFromWorld, const btVector3& rayToWorld)
 			: m_rayFromWorld(rayFromWorld),
 			  m_rayToWorld(rayToWorld),
-              a_closestHitFraction(1.0)
+              a_closestHitFraction(1.0),
+			  m_closestCollisionObject(0)
 		{
 		}
 
@@ -61,6 +62,7 @@ struct hbrClosestRayResultCallback : public btCollisionWorld::RayResultCallback
 		btScalar a_closestHitFraction;
         btVector3 m_closestHitNormalWorld;
 		btVector3 m_closestHitPointWorld;
+		const btCollisionObject* m_closestCollisionObject;
 
         bool hasHit() const
 		{
@@ -87,6 +89,7 @@ struct hbrClosestRayResultCallback : public btCollisionWorld::RayResultCallback
                 m_closestHitNormalWorld = hitNormalWorld;
                 m_closestHitPointWorld = hitPointWorld;
                 a_closestHitFraction = rayResult.m_hitFraction;
+				m_closestCollisionObject = m_collisionObject;
             }
 
 			return m_closestHitFraction;

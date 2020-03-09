@@ -94,6 +94,9 @@ protected:
 	btScalar m_speedModifier;
 	bool m_isAirWalking;
 
+	btScalar m_bunnyHopLimitFactor;
+	bool m_enableBunnyHop;
+
 	bool m_onGround;
 
 	btVector3 m_jumpPosition;
@@ -216,6 +219,8 @@ public:
 	void inheritVelocity(btCollisionWorld * collisionWorld, btScalar dt);
 	void testCollisions(btCollisionWorld * collisionWorld);
 	void setAirWalking(bool enabled) { m_isAirWalking = enabled; };
+	void setBunnyHopEnabled(bool enabled) { m_enableBunnyHop = enabled; };
+	void setBunnyHopFactor(btScalar factor) { m_bunnyHopLimitFactor = factor; };
 	void setSpeedModifier(btScalar speed) { m_speedModifier = speed; };
 	void setFriction(btScalar friction) { m_friction = friction; };
 	void setDrag(btScalar friction) { m_drag = friction; };

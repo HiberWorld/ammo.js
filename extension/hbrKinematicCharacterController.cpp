@@ -188,8 +188,8 @@ hbrKinematicCharacterController::hbrKinematicCharacterController(btPairCachingGh
 	m_verticalVelocity = 0.0;
 	m_verticalOffset = 0.0;
 	m_gravity = 9.8 * 3.0; // 3G acceleration.
-	m_fallSpeed = 55.0;	// Terminal velocity of a sky diver in m/s.
-	m_jumpSpeed = 10.0;	// ?
+	m_fallSpeed = 55.0;	   // Terminal velocity of a sky diver in m/s.
+	m_jumpSpeed = 10.0;	   // ?
 	m_SetjumpSpeed = m_jumpSpeed;
 	m_wasOnGround = false;
 	m_wasJumping = false;
@@ -225,6 +225,10 @@ hbrKinematicCharacterController::hbrKinematicCharacterController(btPairCachingGh
 	m_drag = 0.01;
 	m_currentSpeed = 0.0;
 	m_isAirWalking = false;
+
+	m_bunnyHopLimitFactor = btScalar(1.0);
+	m_enableBunnyHop = false;
+
 	m_speedModifier = 1.0;
 	m_deAccelerationMultiplier = 0.9;
 
@@ -590,7 +594,10 @@ void hbrKinematicCharacterController::stepDown(btCollisionWorld *collisionWorld,
 			m_onGround = true;
 		}
 
-		return;
+		if (m_externalVelocity.length2() > 0.01f)
+		{
+			return;
+		}
 	}
 
 	if (downVelocity > 0.0 && downVelocity > m_fallSpeed && (m_wasOnGround || !m_wasJumping))
@@ -927,6 +934,7 @@ void hbrKinematicCharacterController::playerStep(btCollisionWorld *collisionWorl
 
 	if (m_wasOnGround && !m_wasJumping && m_localVelocity.length2() > SIMD_EPSILON)
 	{
+
 		// btVector3 velDir = m_localVelocity.normalized();
 		// velDir.setY(0.0);
 		// btScalar velDot = velDir.dot(m_walkDirection);
@@ -973,6 +981,21 @@ void hbrKinematicCharacterController::playerStep(btCollisionWorld *collisionWorl
 	if (projVel + accelVel > maxVelocity)
 	{
 		accelVel = btMax(maxVelocity - projVel, 0.0f);
+	}
+
+	//Fix bunny hop
+	if (!m_enableBunnyHop)
+	{
+		btVector3 walkVel = m_localVelocity;
+		walkVel.setY(0.0);
+
+		// btScalar currentVel = walkVel.length();
+		btScalar newVel = (walkVel + m_walkDirection * accelVel).length2();
+		if (newVel > maxVelocity * maxVelocity)
+		{
+			// m_localVelocity -= walkVel.normalize() * (newVel - currentVel) * m_bunnyHopLimitFactor;
+			m_localVelocity -= walkVel.normalize() * accelVel * m_bunnyHopLimitFactor;
+		}
 	}
 
 	btScalar gravity = m_isAirWalking ? 0.0 : m_gravity;
@@ -1257,9 +1280,9 @@ void hbrKinematicCharacterController::jump(const btVector3 &v)
 
 	m_jumpPosition = m_ghostObject->getWorldTransform().getOrigin();
 
-	if (m_localVelocity.y() < 0.0)
+	if (m_localVelocity.y() < 0.0f)
 	{
-		m_localVelocity.setY(0.0);
+		m_localVelocity.setY(0.0f);
 	}
 
 	// printf("m_hitNormalWorld(%f,%f,%f)\n", m_groundNormal[0], m_groundNormal[1], m_groundNormal[2]);
@@ -1270,19 +1293,22 @@ void hbrKinematicCharacterController::jump(const btVector3 &v)
 
 	// btVector3 extraVelocity = projectVectors(m_prevVelocity, m_groundNormal);
 
-	//btVector3 extraVelocity(0.0f, 0.0f, 0.0f);
+	btVector3 extraVelocity(0.0f, 0.0f, 0.0f);
+	btVector3 asd(m_groundNormal.getX(), 0.0f, m_groundNormal.getZ());
 
 	// && m_groundNormal.dot(m_localVelocity) >= 0.0f
-	// if (m_localVelocity.length2() > 0.1f)
-	// {
-	// 	extraVelocity = m_prevVelocity.length() * m_groundNormal * 0.2f;
-	// }
+	if (asd.dot(m_localVelocity) >= 0.0f)
+	{
+		extraVelocity = -m_prevVelocity.getY() * asd * 0.5f;
+	}
 
+	// printf("=========================================================================\n");
+	// printf("m_groundNormal(%f,%f,%f)\n", m_groundNormal[0], m_groundNormal[1], m_groundNormal[2]);
 	// printf("m_prevVelocity(%f,%f,%f)\n", m_prevVelocity[0], m_prevVelocity[1], m_prevVelocity[2]);
-	// printf("extraVelocity(%f,%f,%f)\n", extraVelocity[0], extraVelocity[1], extraVelocity[2]);
 	// printf("m_localVelocity(%f,%f,%f)\n", m_localVelocity[0], m_localVelocity[1], m_localVelocity[2]);
+	// printf("extraVelocity(%f,%f,%f)\n", extraVelocity[0], extraVelocity[1], extraVelocity[2]);
 
-	m_localVelocity += m_jumpAxis * m_verticalVelocity * m_speedModifier;// + extraVelocity;
+	m_localVelocity += m_jumpAxis * m_verticalVelocity * m_speedModifier + extraVelocity;
 #if 0
 	currently no jumping.
 	btTransform xform;
