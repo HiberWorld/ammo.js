@@ -594,7 +594,7 @@ void hbrKinematicCharacterController::stepDown(btCollisionWorld *collisionWorld,
 			m_onGround = true;
 		}
 
-		if (m_externalVelocity.length2() > 0.01f)
+		if (m_externalVelocity.length2() > 0.01f || m_isAirWalking)
 		{
 			return;
 		}
